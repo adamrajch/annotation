@@ -1,0 +1,25 @@
+type User {
+  id: ID! @id @unique
+  name: String!
+  createdAt: DateTime! @createdAt
+  email: String! @unique
+}
+
+type Annotation {
+  id: ID! @id @unique
+  createdAt: DateTime! @createdAt
+  note: String!
+  page: Int
+  chapter: String!
+  title: String!
+  parent: Book! @relation(name: "BookNotes")
+  favorite: Boolean! @default(value: false)
+}
+
+type Book {
+  id: ID! @id @unique
+  createdAt: DateTime! @createdAt
+  title: String!
+  author: User! @relation(name: "UserBooks")
+  annotations: [Annotation!]! @relation(name: "BookNotes")
+}
