@@ -3,6 +3,7 @@ type User {
   name: String!
   createdAt: DateTime! @createdAt
   email: String! @unique
+  books: [Book!]! @relation(name: "UserBooks")
 }
 
 type Annotation {
