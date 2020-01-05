@@ -4,17 +4,21 @@ type User {
   createdAt: DateTime! @createdAt
   email: String! @unique
   books: [Book!]! @relation(name: "UserBooks")
+  groups: [Group!]! @relation(name: "UserGroups")
 }
 
 type Annotation {
   id: ID! @id @unique
   createdAt: DateTime! @createdAt
-  note: String!
-  page: Int
+  quote: String!
+  note: [String!]! @scalarList(strategy: RELATION)
   chapter: String!
+  page: Int
   title: String!
   parent: Book! @relation(name: "BookNotes")
   favorite: Boolean! @default(value: false)
+  tags: [String!]! @scalarList(strategy: RELATION)
+  groups: [Group!]! @relation(name: "GroupAnnotations")
 }
 
 type Book {
@@ -23,4 +27,11 @@ type Book {
   title: String!
   author: User! @relation(name: "UserBooks")
   annotations: [Annotation!]! @relation(name: "BookNotes")
+}
+
+type Group {
+  id: ID! @id @unique
+  title: String!
+  author: User! @relation(name: "UserGroups")
+  annotations: [Annotation!]! @relation(name: "GroupAnnotations")
 }
