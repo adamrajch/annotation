@@ -1,34 +1,30 @@
 const Subscription = {
-    count: {
-        subscribe(parent, args, { pubsub }, info) {
-            let count = 0
-            setInterval(() => {
-                count++
-                pubsub.publish('count', {
-                    count
-                })
-            }, 1000)
-            return pubsub.asyncIterator('count')
-        }
-    },
-    list: {
-        subscribe(parent, { userId }, { db, pubsub }, info) {
-
-            return pubsub.asyncIterator(`user`)
-        }
-    },
-    show: {
-        subscribe(parent, { listId }, { db, pubsub }, info) {
-            const sublist = db.lists.find(list => {
-                return list.id == listId
-            })
-
-            if (!sublist) {
-                throw new Error('no list found')
-            }
-            return pubsub.asyncIterator(`list: ${listId}`)
-        }
+  book: {
+    subscribe(parent, args, { prisma }, info) {
+      return prisma.subscription.book(null, info);
     }
-}
+  },
+  annotation: {
+    subscribe(parent, args, { prisma }, info) {
+      return prisma.subscription.annotation(
+        {
+          where: {
+            node: {
+              parent: {
+                id: args.bookId
+              }
+            }
+          }
+        },
+        info
+      );
+    }
+  }
+  //   group: {
+  //     subscribe(parent, args, { prisma }, info) {
+  //       return prisma.subscription.group(null, info);
+  //     }
+  //   }
+};
 
-export { Subscription as default }
+export { Subscription as default };

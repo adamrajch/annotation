@@ -1,37 +1,40 @@
 type User {
   id: ID! @id @unique
   name: String!
-  createdAt: DateTime! @createdAt
   email: String! @unique
-  books: [Book!]! @relation(name: "UserBooks")
-  groups: [Group!]! @relation(name: "UserGroups")
+  password: String!
+  books: [Book!]! @relation(name: "UserBooks", onDelete: CASCADE)
+  groups: [Group!]! @relation(name: "UserGroups", onDelete: CASCADE)
+  annotations: [Annotation!]!
+    @relation(name: "UserAnnotations", onDelete: CASCADE)
 }
 
 type Annotation {
   id: ID! @id @unique
-  createdAt: DateTime! @createdAt
   quote: String!
   note: [String!]! @scalarList(strategy: RELATION)
   chapter: String!
   page: Int
   title: String!
-  parent: Book! @relation(name: "BookNotes")
+  parent: Book! @relation(name: "BookNotes", onDelete: SET_NULL)
+  author: User! @relation(name: "UserAnnotations", onDelete: SET_NULL)
   favorite: Boolean! @default(value: false)
   tags: [String!]! @scalarList(strategy: RELATION)
-  groups: [Group!]! @relation(name: "GroupAnnotations")
+  groups: [Group!]! @relation(name: "GroupAnnotations", onDelete: SET_NULL)
 }
 
 type Book {
   id: ID! @id @unique
-  createdAt: DateTime! @createdAt
   title: String!
-  author: User! @relation(name: "UserBooks")
-  annotations: [Annotation!]! @relation(name: "BookNotes")
+  author: User! @relation(name: "UserBooks", onDelete: SET_NULL)
+  writer: String!
+  annotations: [Annotation!]! @relation(name: "BookNotes", onDelete: CASCADE)
 }
 
 type Group {
   id: ID! @id @unique
   title: String!
-  author: User! @relation(name: "UserGroups")
-  annotations: [Annotation!]! @relation(name: "GroupAnnotations")
+  author: User! @relation(name: "UserGroups", onDelete: SET_NULL)
+  annotations: [Annotation!]!
+    @relation(name: "GroupAnnotations", onDelete: SET_NULL)
 }

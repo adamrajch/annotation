@@ -1,5 +1,5 @@
 # source: http://192.168.99.100:4466
-# timestamp: Sat Jan 04 2020 19:05:57 GMT-0600 (Central Standard Time)
+# timestamp: Mon Jan 13 2020 04:25:32 GMT-0600 (Central Standard Time)
 
 type AggregateAnnotation {
   count: Int!
@@ -19,13 +19,13 @@ type AggregateUser {
 
 type Annotation implements Node {
   id: ID!
-  createdAt: DateTime!
   quote: String!
   note: [String!]!
   chapter: String!
   page: Int
   title: String!
   parent: Book!
+  author: User!
   favorite: Boolean!
   tags: [String!]!
   groups(where: GroupWhereInput, orderBy: GroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Group!]
@@ -51,7 +51,13 @@ input AnnotationCreateInput {
   note: AnnotationCreatenoteInput
   tags: AnnotationCreatetagsInput
   parent: BookCreateOneWithoutAnnotationsInput!
+  author: UserCreateOneWithoutAnnotationsInput!
   groups: GroupCreateManyWithoutAnnotationsInput
+}
+
+input AnnotationCreateManyWithoutAuthorInput {
+  create: [AnnotationCreateWithoutAuthorInput!]
+  connect: [AnnotationWhereUniqueInput!]
 }
 
 input AnnotationCreateManyWithoutGroupsInput {
@@ -72,6 +78,19 @@ input AnnotationCreatetagsInput {
   set: [String!]
 }
 
+input AnnotationCreateWithoutAuthorInput {
+  id: ID
+  quote: String!
+  chapter: String!
+  page: Int
+  title: String!
+  favorite: Boolean
+  note: AnnotationCreatenoteInput
+  tags: AnnotationCreatetagsInput
+  parent: BookCreateOneWithoutAnnotationsInput!
+  groups: GroupCreateManyWithoutAnnotationsInput
+}
+
 input AnnotationCreateWithoutGroupsInput {
   id: ID
   quote: String!
@@ -82,6 +101,7 @@ input AnnotationCreateWithoutGroupsInput {
   note: AnnotationCreatenoteInput
   tags: AnnotationCreatetagsInput
   parent: BookCreateOneWithoutAnnotationsInput!
+  author: UserCreateOneWithoutAnnotationsInput!
 }
 
 input AnnotationCreateWithoutParentInput {
@@ -93,6 +113,7 @@ input AnnotationCreateWithoutParentInput {
   favorite: Boolean
   note: AnnotationCreatenoteInput
   tags: AnnotationCreatetagsInput
+  author: UserCreateOneWithoutAnnotationsInput!
   groups: GroupCreateManyWithoutAnnotationsInput
 }
 
@@ -108,8 +129,6 @@ type AnnotationEdge {
 enum AnnotationOrderByInput {
   id_ASC
   id_DESC
-  createdAt_ASC
-  createdAt_DESC
   quote_ASC
   quote_DESC
   chapter_ASC
@@ -124,7 +143,6 @@ enum AnnotationOrderByInput {
 
 type AnnotationPreviousValues {
   id: ID!
-  createdAt: DateTime!
   quote: String!
   note: [String!]!
   chapter: String!
@@ -183,28 +201,6 @@ input AnnotationScalarWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
-  createdAt: DateTime
-
-  """All values that are not equal to given value."""
-  createdAt_not: DateTime
-
-  """All values that are contained in given list."""
-  createdAt_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  createdAt_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  createdAt_lt: DateTime
-
-  """All values less than or equal the given value."""
-  createdAt_lte: DateTime
-
-  """All values greater than the given value."""
-  createdAt_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  createdAt_gte: DateTime
   quote: String
 
   """All values that are not equal to given value."""
@@ -399,6 +395,7 @@ input AnnotationUpdateInput {
   note: AnnotationUpdatenoteInput
   tags: AnnotationUpdatetagsInput
   parent: BookUpdateOneRequiredWithoutAnnotationsInput
+  author: UserUpdateOneRequiredWithoutAnnotationsInput
   groups: GroupUpdateManyWithoutAnnotationsInput
 }
 
@@ -420,6 +417,18 @@ input AnnotationUpdateManyMutationInput {
   favorite: Boolean
   note: AnnotationUpdatenoteInput
   tags: AnnotationUpdatetagsInput
+}
+
+input AnnotationUpdateManyWithoutAuthorInput {
+  create: [AnnotationCreateWithoutAuthorInput!]
+  connect: [AnnotationWhereUniqueInput!]
+  set: [AnnotationWhereUniqueInput!]
+  disconnect: [AnnotationWhereUniqueInput!]
+  delete: [AnnotationWhereUniqueInput!]
+  update: [AnnotationUpdateWithWhereUniqueWithoutAuthorInput!]
+  updateMany: [AnnotationUpdateManyWithWhereNestedInput!]
+  deleteMany: [AnnotationScalarWhereInput!]
+  upsert: [AnnotationUpsertWithWhereUniqueWithoutAuthorInput!]
 }
 
 input AnnotationUpdateManyWithoutGroupsInput {
@@ -459,6 +468,18 @@ input AnnotationUpdatetagsInput {
   set: [String!]
 }
 
+input AnnotationUpdateWithoutAuthorDataInput {
+  quote: String
+  chapter: String
+  page: Int
+  title: String
+  favorite: Boolean
+  note: AnnotationUpdatenoteInput
+  tags: AnnotationUpdatetagsInput
+  parent: BookUpdateOneRequiredWithoutAnnotationsInput
+  groups: GroupUpdateManyWithoutAnnotationsInput
+}
+
 input AnnotationUpdateWithoutGroupsDataInput {
   quote: String
   chapter: String
@@ -468,6 +489,7 @@ input AnnotationUpdateWithoutGroupsDataInput {
   note: AnnotationUpdatenoteInput
   tags: AnnotationUpdatetagsInput
   parent: BookUpdateOneRequiredWithoutAnnotationsInput
+  author: UserUpdateOneRequiredWithoutAnnotationsInput
 }
 
 input AnnotationUpdateWithoutParentDataInput {
@@ -478,7 +500,13 @@ input AnnotationUpdateWithoutParentDataInput {
   favorite: Boolean
   note: AnnotationUpdatenoteInput
   tags: AnnotationUpdatetagsInput
+  author: UserUpdateOneRequiredWithoutAnnotationsInput
   groups: GroupUpdateManyWithoutAnnotationsInput
+}
+
+input AnnotationUpdateWithWhereUniqueWithoutAuthorInput {
+  where: AnnotationWhereUniqueInput!
+  data: AnnotationUpdateWithoutAuthorDataInput!
 }
 
 input AnnotationUpdateWithWhereUniqueWithoutGroupsInput {
@@ -489,6 +517,12 @@ input AnnotationUpdateWithWhereUniqueWithoutGroupsInput {
 input AnnotationUpdateWithWhereUniqueWithoutParentInput {
   where: AnnotationWhereUniqueInput!
   data: AnnotationUpdateWithoutParentDataInput!
+}
+
+input AnnotationUpsertWithWhereUniqueWithoutAuthorInput {
+  where: AnnotationWhereUniqueInput!
+  update: AnnotationUpdateWithoutAuthorDataInput!
+  create: AnnotationCreateWithoutAuthorInput!
 }
 
 input AnnotationUpsertWithWhereUniqueWithoutGroupsInput {
@@ -552,28 +586,6 @@ input AnnotationWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
-  createdAt: DateTime
-
-  """All values that are not equal to given value."""
-  createdAt_not: DateTime
-
-  """All values that are contained in given list."""
-  createdAt_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  createdAt_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  createdAt_lt: DateTime
-
-  """All values less than or equal the given value."""
-  createdAt_lte: DateTime
-
-  """All values greater than the given value."""
-  createdAt_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  createdAt_gte: DateTime
   quote: String
 
   """All values that are not equal to given value."""
@@ -721,6 +733,7 @@ input AnnotationWhereInput {
   """All values that are not equal to given value."""
   favorite_not: Boolean
   parent: BookWhereInput
+  author: UserWhereInput
   groups_every: GroupWhereInput
   groups_some: GroupWhereInput
   groups_none: GroupWhereInput
@@ -737,9 +750,9 @@ type BatchPayload {
 
 type Book implements Node {
   id: ID!
-  createdAt: DateTime!
   title: String!
   author: User!
+  writer: String!
   annotations(where: AnnotationWhereInput, orderBy: AnnotationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Annotation!]
 }
 
@@ -756,6 +769,7 @@ type BookConnection {
 input BookCreateInput {
   id: ID
   title: String!
+  writer: String!
   author: UserCreateOneWithoutBooksInput!
   annotations: AnnotationCreateManyWithoutParentInput
 }
@@ -773,12 +787,14 @@ input BookCreateOneWithoutAnnotationsInput {
 input BookCreateWithoutAnnotationsInput {
   id: ID
   title: String!
+  writer: String!
   author: UserCreateOneWithoutBooksInput!
 }
 
 input BookCreateWithoutAuthorInput {
   id: ID
   title: String!
+  writer: String!
   annotations: AnnotationCreateManyWithoutParentInput
 }
 
@@ -794,16 +810,16 @@ type BookEdge {
 enum BookOrderByInput {
   id_ASC
   id_DESC
-  createdAt_ASC
-  createdAt_DESC
   title_ASC
   title_DESC
+  writer_ASC
+  writer_DESC
 }
 
 type BookPreviousValues {
   id: ID!
-  createdAt: DateTime!
   title: String!
+  writer: String!
 }
 
 input BookScalarWhereInput {
@@ -855,28 +871,6 @@ input BookScalarWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
-  createdAt: DateTime
-
-  """All values that are not equal to given value."""
-  createdAt_not: DateTime
-
-  """All values that are contained in given list."""
-  createdAt_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  createdAt_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  createdAt_lt: DateTime
-
-  """All values less than or equal the given value."""
-  createdAt_lte: DateTime
-
-  """All values greater than the given value."""
-  createdAt_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  createdAt_gte: DateTime
   title: String
 
   """All values that are not equal to given value."""
@@ -917,6 +911,46 @@ input BookScalarWhereInput {
 
   """All values not ending with the given string."""
   title_not_ends_with: String
+  writer: String
+
+  """All values that are not equal to given value."""
+  writer_not: String
+
+  """All values that are contained in given list."""
+  writer_in: [String!]
+
+  """All values that are not contained in given list."""
+  writer_not_in: [String!]
+
+  """All values less than the given value."""
+  writer_lt: String
+
+  """All values less than or equal the given value."""
+  writer_lte: String
+
+  """All values greater than the given value."""
+  writer_gt: String
+
+  """All values greater than or equal the given value."""
+  writer_gte: String
+
+  """All values containing the given string."""
+  writer_contains: String
+
+  """All values not containing the given string."""
+  writer_not_contains: String
+
+  """All values starting with the given string."""
+  writer_starts_with: String
+
+  """All values not starting with the given string."""
+  writer_not_starts_with: String
+
+  """All values ending with the given string."""
+  writer_ends_with: String
+
+  """All values not ending with the given string."""
+  writer_not_ends_with: String
 }
 
 type BookSubscriptionPayload {
@@ -958,16 +992,19 @@ input BookSubscriptionWhereInput {
 
 input BookUpdateInput {
   title: String
+  writer: String
   author: UserUpdateOneRequiredWithoutBooksInput
   annotations: AnnotationUpdateManyWithoutParentInput
 }
 
 input BookUpdateManyDataInput {
   title: String
+  writer: String
 }
 
 input BookUpdateManyMutationInput {
   title: String
+  writer: String
 }
 
 input BookUpdateManyWithoutAuthorInput {
@@ -996,11 +1033,13 @@ input BookUpdateOneRequiredWithoutAnnotationsInput {
 
 input BookUpdateWithoutAnnotationsDataInput {
   title: String
+  writer: String
   author: UserUpdateOneRequiredWithoutBooksInput
 }
 
 input BookUpdateWithoutAuthorDataInput {
   title: String
+  writer: String
   annotations: AnnotationUpdateManyWithoutParentInput
 }
 
@@ -1069,28 +1108,6 @@ input BookWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
-  createdAt: DateTime
-
-  """All values that are not equal to given value."""
-  createdAt_not: DateTime
-
-  """All values that are contained in given list."""
-  createdAt_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  createdAt_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  createdAt_lt: DateTime
-
-  """All values less than or equal the given value."""
-  createdAt_lte: DateTime
-
-  """All values greater than the given value."""
-  createdAt_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  createdAt_gte: DateTime
   title: String
 
   """All values that are not equal to given value."""
@@ -1131,6 +1148,46 @@ input BookWhereInput {
 
   """All values not ending with the given string."""
   title_not_ends_with: String
+  writer: String
+
+  """All values that are not equal to given value."""
+  writer_not: String
+
+  """All values that are contained in given list."""
+  writer_in: [String!]
+
+  """All values that are not contained in given list."""
+  writer_not_in: [String!]
+
+  """All values less than the given value."""
+  writer_lt: String
+
+  """All values less than or equal the given value."""
+  writer_lte: String
+
+  """All values greater than the given value."""
+  writer_gt: String
+
+  """All values greater than or equal the given value."""
+  writer_gte: String
+
+  """All values containing the given string."""
+  writer_contains: String
+
+  """All values not containing the given string."""
+  writer_not_contains: String
+
+  """All values starting with the given string."""
+  writer_starts_with: String
+
+  """All values not starting with the given string."""
+  writer_not_starts_with: String
+
+  """All values ending with the given string."""
+  writer_ends_with: String
+
+  """All values not ending with the given string."""
+  writer_not_ends_with: String
   author: UserWhereInput
   annotations_every: AnnotationWhereInput
   annotations_some: AnnotationWhereInput
@@ -1140,8 +1197,6 @@ input BookWhereInput {
 input BookWhereUniqueInput {
   id: ID
 }
-
-scalar DateTime
 
 type Group implements Node {
   id: ID!
@@ -1611,10 +1666,11 @@ type Subscription {
 type User implements Node {
   id: ID!
   name: String!
-  createdAt: DateTime!
   email: String!
+  password: String!
   books(where: BookWhereInput, orderBy: BookOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Book!]
   groups(where: GroupWhereInput, orderBy: GroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Group!]
+  annotations(where: AnnotationWhereInput, orderBy: AnnotationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Annotation!]
 }
 
 """A connection to a list of items."""
@@ -1631,8 +1687,15 @@ input UserCreateInput {
   id: ID
   name: String!
   email: String!
+  password: String!
   books: BookCreateManyWithoutAuthorInput
   groups: GroupCreateManyWithoutAuthorInput
+  annotations: AnnotationCreateManyWithoutAuthorInput
+}
+
+input UserCreateOneWithoutAnnotationsInput {
+  create: UserCreateWithoutAnnotationsInput
+  connect: UserWhereUniqueInput
 }
 
 input UserCreateOneWithoutBooksInput {
@@ -1645,18 +1708,31 @@ input UserCreateOneWithoutGroupsInput {
   connect: UserWhereUniqueInput
 }
 
+input UserCreateWithoutAnnotationsInput {
+  id: ID
+  name: String!
+  email: String!
+  password: String!
+  books: BookCreateManyWithoutAuthorInput
+  groups: GroupCreateManyWithoutAuthorInput
+}
+
 input UserCreateWithoutBooksInput {
   id: ID
   name: String!
   email: String!
+  password: String!
   groups: GroupCreateManyWithoutAuthorInput
+  annotations: AnnotationCreateManyWithoutAuthorInput
 }
 
 input UserCreateWithoutGroupsInput {
   id: ID
   name: String!
   email: String!
+  password: String!
   books: BookCreateManyWithoutAuthorInput
+  annotations: AnnotationCreateManyWithoutAuthorInput
 }
 
 """An edge in a connection."""
@@ -1673,17 +1749,17 @@ enum UserOrderByInput {
   id_DESC
   name_ASC
   name_DESC
-  createdAt_ASC
-  createdAt_DESC
   email_ASC
   email_DESC
+  password_ASC
+  password_DESC
 }
 
 type UserPreviousValues {
   id: ID!
   name: String!
-  createdAt: DateTime!
   email: String!
+  password: String!
 }
 
 type UserSubscriptionPayload {
@@ -1726,13 +1802,23 @@ input UserSubscriptionWhereInput {
 input UserUpdateInput {
   name: String
   email: String
+  password: String
   books: BookUpdateManyWithoutAuthorInput
   groups: GroupUpdateManyWithoutAuthorInput
+  annotations: AnnotationUpdateManyWithoutAuthorInput
 }
 
 input UserUpdateManyMutationInput {
   name: String
   email: String
+  password: String
+}
+
+input UserUpdateOneRequiredWithoutAnnotationsInput {
+  create: UserCreateWithoutAnnotationsInput
+  connect: UserWhereUniqueInput
+  update: UserUpdateWithoutAnnotationsDataInput
+  upsert: UserUpsertWithoutAnnotationsInput
 }
 
 input UserUpdateOneRequiredWithoutBooksInput {
@@ -1749,16 +1835,33 @@ input UserUpdateOneRequiredWithoutGroupsInput {
   upsert: UserUpsertWithoutGroupsInput
 }
 
+input UserUpdateWithoutAnnotationsDataInput {
+  name: String
+  email: String
+  password: String
+  books: BookUpdateManyWithoutAuthorInput
+  groups: GroupUpdateManyWithoutAuthorInput
+}
+
 input UserUpdateWithoutBooksDataInput {
   name: String
   email: String
+  password: String
   groups: GroupUpdateManyWithoutAuthorInput
+  annotations: AnnotationUpdateManyWithoutAuthorInput
 }
 
 input UserUpdateWithoutGroupsDataInput {
   name: String
   email: String
+  password: String
   books: BookUpdateManyWithoutAuthorInput
+  annotations: AnnotationUpdateManyWithoutAuthorInput
+}
+
+input UserUpsertWithoutAnnotationsInput {
+  update: UserUpdateWithoutAnnotationsDataInput!
+  create: UserCreateWithoutAnnotationsInput!
 }
 
 input UserUpsertWithoutBooksInput {
@@ -1860,28 +1963,6 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   name_not_ends_with: String
-  createdAt: DateTime
-
-  """All values that are not equal to given value."""
-  createdAt_not: DateTime
-
-  """All values that are contained in given list."""
-  createdAt_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  createdAt_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  createdAt_lt: DateTime
-
-  """All values less than or equal the given value."""
-  createdAt_lte: DateTime
-
-  """All values greater than the given value."""
-  createdAt_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  createdAt_gte: DateTime
   email: String
 
   """All values that are not equal to given value."""
@@ -1922,12 +2003,55 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   email_not_ends_with: String
+  password: String
+
+  """All values that are not equal to given value."""
+  password_not: String
+
+  """All values that are contained in given list."""
+  password_in: [String!]
+
+  """All values that are not contained in given list."""
+  password_not_in: [String!]
+
+  """All values less than the given value."""
+  password_lt: String
+
+  """All values less than or equal the given value."""
+  password_lte: String
+
+  """All values greater than the given value."""
+  password_gt: String
+
+  """All values greater than or equal the given value."""
+  password_gte: String
+
+  """All values containing the given string."""
+  password_contains: String
+
+  """All values not containing the given string."""
+  password_not_contains: String
+
+  """All values starting with the given string."""
+  password_starts_with: String
+
+  """All values not starting with the given string."""
+  password_not_starts_with: String
+
+  """All values ending with the given string."""
+  password_ends_with: String
+
+  """All values not ending with the given string."""
+  password_not_ends_with: String
   books_every: BookWhereInput
   books_some: BookWhereInput
   books_none: BookWhereInput
   groups_every: GroupWhereInput
   groups_some: GroupWhereInput
   groups_none: GroupWhereInput
+  annotations_every: AnnotationWhereInput
+  annotations_some: AnnotationWhereInput
+  annotations_none: AnnotationWhereInput
 }
 
 input UserWhereUniqueInput {

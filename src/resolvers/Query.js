@@ -1,53 +1,96 @@
+import getUserId from "../utils/getUserId";
 const Query = {
-
-    shows(parent, args, { db }, info) {
-        return db.shows;
-    },
-    lists(parent, args, { db }, info) {
-        return db.lists
+  me(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+    return prisma.query.user({
+      where: {
+        id: userId
+      }
+    });
+  },
+  users(parent, args, { db, prisma }, info) {
+    const opArgs = {};
+    if (args.query) {
+      opArgs.where = {
+        OR: [
+          {
+            name_contains: args.query
+          },
+          {
+            email_contains: args.query
+          }
+        ]
+      };
     }
-    ,
-    me(parent, args, { db }, info) {
-        if (!args.name) {
-            return db.users.find(user => {
-                return user.id == args.id
-            })
-        }
-        return db.users.find(x => x.name == args.name)
-
-    },
-    users(parent, args, { db }, info) {
-        return db.users
+    return prisma.query.users(opArgs, info);
+  },
+  books(parent, args, { db, prisma }, info) {
+    const opArgs = {};
+    if (args.query) {
+      opArgs.where = {
+        OR: [
+          {
+            title_contains: args.query
+          },
+          {
+            writer_contains: args.query
+          }
+        ]
+      };
     }
-    ,
-    findList(parent, args, { db }, info) {
-        const nameExists = db.lists.some(list => {
-            return args.name == list.name
-        })
-        const idExists = db.lists.some(list => {
-            return args.id == list.id
-        })
-        if (!nameExists && !idExists) {
-            throw new Error('list does not exist')
-        }
-
-        let returnList = [];
-        if (!args.id) {
-            returnList = db.lists.filter(list => {
-                return args.name == list.name
-            })
-            return returnList;
-        }
-        else {
-
-            let content = db.lists.find(list => {
-                return args.id == list.id
-            })
-            returnList.push(content);
-            return returnList;
-        }
+    return prisma.query.books(opArgs, info);
+  },
+  annotations(parent, args, { db, prisma }, info) {
+    const opArgs = {};
+    if (args.query) {
+      opArgs.where = {
+        OR: [
+          {
+            quote_contains: args.query
+          },
+          {
+            title_contains: args.query
+          },
+          {
+            parent: {
+              OR: [
+                {
+                  title_contains: args.query
+                },
+                {
+                  writer_contains: args.query
+                }
+              ]
+            }
+          }
+        ]
+      };
     }
+    return prisma.query.annotations(opArgs, info);
+  },
+  groups(parent, args, { prisma }, info) {
+    const opArgs = {};
+    if (opArgs) {
+      opArgs.where = {
+        title_contains: args.query
+      };
+    }
+    return prisma.query.groups(opArgs, info);
+  },
+  findBook(parent, { id }, { db, prisma }, info) {
+    return prisma.query.book({
+      where: {
+        id: id
+      }
+    });
+  },
+  findAnnotation(parent, { id }, { db, prisma }, info) {
+    return prisma.query.annotation({
+      where: {
+        id: id
+      }
+    });
+  }
+};
 
-}
-
-export { Query as default }
+export { Query as default };

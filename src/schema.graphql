@@ -1,85 +1,83 @@
-    type Query {
-        me(name: String, id:ID):User!
-        users: [User!]!
-        shows: [Show!]!
-        lists:[AniList!]!
-        findList(id: ID, name:String):[AniList!]!
-    }
+type Query {
+  me(name: String, id: ID): User!
+  users: [User!]!
+  findList(id: ID, name: String): [AniList!]!
+}
 
-    type Mutation {
-        createUser(name: String!, email: String!): User!
-        deleteUser(id:ID!):User!
-        updateUser(id:ID!, data: updateUserInput! ):User!
-        createList(name:String!, author: ID!, published:Boolean!): AniList!
-        deleteList(id:ID!): AniList!   
-        updateList(id:ID!, data: updateListInput!): AniList!
-        createShow(author:ID!, data:ShowData!):Show!
-        deleteShow(id:ID!): Show!
-    } 
+type Mutation {
+  createUser(name: String!, email: String!): User!
+  deleteUser(id: ID!): User!
+  updateUser(id: ID!, data: updateUserInput!): User!
+  createList(name: String!, author: ID!, published: Boolean!): AniList!
+  deleteList(id: ID!): AniList!
+  updateList(id: ID!, data: updateListInput!): AniList!
+  createShow(author: ID!, data: ShowData!): Show!
+  deleteShow(id: ID!): Show!
+}
 
-    type Subscription {
-        count: Int!
-        list: ListSubscriptionPayload!    
-        show(listId: ID!): ShowSubscriptionPayload!
-    }
-    input updateListInput{
-        name:String
-        collection: [ShowData]
-    }
-     input updateUserInput {
-        name:String
-        email:String
-    }
-    input ShowData{
-        title: String
-        id:ID
-        genres: [String!]
-        status: String
-        isAdult:Boolean
-        episodes: Int
-        coverImage: String
-        averageScore:Float
-    }
-    type User {
-        id:ID!
-        name:String!
-        email: String!
-        joinedAt: Int
-        AniLists: [AniList!]!
-    }
-    
-    type Show { 
-        author: AniList!
-        title: String!
-        id:ID!
-        genres: [String!]!
-        status: String!
-        isAdult:Boolean!
-        episodes: Int
-        coverImage: String
-        averageScore:Float
-    }
+type Subscription {
+  count: Int!
+  list: ListSubscriptionPayload!
+  show(listId: ID!): ShowSubscriptionPayload!
+}
+input updateListInput {
+  name: String
+  collection: [ShowData]
+}
+input updateUserInput {
+  name: String
+  email: String
+}
+input ShowData {
+  title: String
+  id: ID
+  genres: [String!]
+  status: String
+  isAdult: Boolean
+  episodes: Int
+  coverImage: String
+  averageScore: Float
+}
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  joinedAt: Int
+  AniLists: [AniList!]!
+}
 
-    type AniList {
-        collection: [Show!]
-        name: String!
-        author: User!
-        id:ID!
-        published:Boolean
-    }
+type Show {
+  author: AniList!
+  title: String!
+  id: ID!
+  genres: [String!]!
+  status: String!
+  isAdult: Boolean!
+  episodes: Int
+  coverImage: String
+  averageScore: Float
+}
 
-    enum MutationType{
-        CREATED
-        UPDATED
-        DELETED
-    }
+type AniList {
+  collection: [Show!]
+  name: String!
+  author: User!
+  id: ID!
+  published: Boolean
+}
 
-    type ShowSubscriptionPayload{
-        mutation: MutationType
-        data: Show!
-    }
+enum MutationType {
+  CREATED
+  UPDATED
+  DELETED
+}
 
-     type ListSubscriptionPayload{
-        mutation: MutationType
-        data: AniList!
-    }
+type ShowSubscriptionPayload {
+  mutation: MutationType
+  data: Show!
+}
+
+type ListSubscriptionPayload {
+  mutation: MutationType
+  data: AniList!
+}

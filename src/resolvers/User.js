@@ -1,9 +1,3 @@
-const User = {
-    AniLists(parent, args, { db }, info) {
-        return db.lists.filter(list => {
-            return list.author == parent.id
-        })
-    }
-}
+const User = {};
 
-export { User as default }
+export { User as default };

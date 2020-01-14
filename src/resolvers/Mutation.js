@@ -1,175 +1,198 @@
-import uuidv4 from 'uuid/v4';
-
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import getUserId from "../utils/getUserId";
 const Mutation = {
-    createUser(parent, args, { db }, info) {
-        const emailTaken = db.users.some(user => {
-            return user.email == args.email
-        })
-
-        if (emailTaken) {
-            throw new Error('email taken');
-        }
-        const newUser = {
-            id: uuidv4(),
-            AniLists: [],
-            ...args
-        }
-        db.users.push(newUser)
-        return newUser;
-    },
-    deleteUser(parent, { id }, { db }, info) {
-        const userIndex = db.users.findIndex((user) => {
-            return user.id == id
-        })
-
-        if (userIndex == -1) {
-            throw new Error('user not found!')
-        }
-
-        const deletedUsers = db.users.splice(userIndex, 1)
-        db.lists = db.lists.filter(list => {
-            return list.author !== id
-
-        })
-        return deletedUsers[0];
-
-    }
-    ,
-    updateUser(parent, args, { db }, info) {
-        const { id, data } = args
-        const user = db.users.find(user => {
-            return user.id == id
-        })
-
-        if (!user) {
-            throw new Error("user not found")
-        }
-
-        if (typeof data.email === 'string') {
-            const emailTaken = db.users.some(user => {
-                user.email == data.email
-            })
-            if (emailTaken) {
-                throw new Error('email in use')
-            }
-            user.email = data.email
-        }
-        if (typeof data.name == 'string') {
-            user.name = data.name
-        }
-        return user;
-
-    },
-
-    createList(parent, args, { db, pubsub }, info) {
-        const userExists = db.users.some(user => {
-            return user.id == args.author
-        })
-        if (!userExists) {
-            throw new Error('user does not exist!')
-        }
-        const newList = {
-            id: uuidv4(),
-            collection: [],
-            ...args
-        }
-
-        db.lists.push(newList)
-
-        pubsub.publish(`user`,
-            {
-                list: {
-                    mutation: "CREATED",
-                    data: newList
-                }
-            })
-        return newList
-    },
-    deleteList(parent, args, { db, pubsub }, info) {
-        const listIndex = db.lists.findIndex(list => {
-            return list.id == args.id
-        })
-
-        if (listIndex == -1) {
-            throw new Error('list does not exist')
-        }
-
-        const deletedList = db.lists.splice(listIndex, 1)
-        pubsub.publish(`user`,
-            {
-                list: {
-                    mutation: "DELETED",
-                    data: deletedList[0]
-                }
-            })
-
-        return deletedList[0]
-    },
-    updateList(parent, args, { db, pubsub }, info) {
-        const { id, data } = args;
-        const foundList = db.lists.find(list => {
-            return list.id == id
-        })
-        if (!foundList) {
-            throw new Error('list not found')
-        }
-
-        if (typeof data.name == 'string') {
-            foundList.name = data.name
-        }
-        if (typeof data.collection == 'array') {
-            foundList.collection.concat(data.collection)
-            for (let i = 0; i < data.collection.length; i++) {
-                db.shows.push(data.collection[i])
-            }
-        }
-        pubsub.publish(`user`,
-            {
-                list: {
-                    mutation: "UPDATED",
-                    data: foundList
-                }
-            })
-
-        return foundList;
-    },
-    createShow(parent, args, { db, pubsub }, info) {
-        const { author, data } = args
-        console.log(author)
-        const listExists = db.lists.some(list => {
-            return list.id == author
-        })
-        if (!listExists) {
-            throw new Error('list does not exist')
-        }
-        const newShow = {
-            id: uuidv4(),
-            author: author,
-            ...data
-        }
-
-        db.shows.push(newShow)
-
-        pubsub.publish(`list: ${author}`, {
-            show: {
-                mutation: "CREATED",
-                data: newShow
-            }
-        })
-        return newShow
-    },
-    deleteShow(parent, { id }, { db }, info) {
-        const showIndex = db.shows.findIndex(show => {
-            return show.id == id
-        })
-        if (showIndex == -1) {
-            throw new Error('show does not exist')
-        }
-        const deletedShow = db.shows.splice(showIndex, 1)
-
-        return deletedShow[0]
+  async createUser(parent, args, { prisma }, info) {
+    if (args.data.password.length < 8) {
+      throw new Error("Password must be 8 characters or longer.");
     }
 
-}
+    const password = await bcrypt.hash(args.data.password, 10);
+    const user = prisma.mutation.createUser({
+      data: {
+        ...args.data,
+        password
+      }
+    });
 
-export { Mutation as default }
+    return {
+      user,
+      token: jwt.sign({ userId: user.id }, "thisisasecret")
+    };
+  },
+
+  async loginUser(parent, args, { prisma }, info) {
+    const user = await prisma.query.user({
+      where: {
+        email: args.email
+      }
+    });
+
+    if (!user) {
+      throw new Error("Unable to login");
+    }
+    const isMatch = await bcrypt.compare(args.password, user.password);
+
+    if (!isMatch) {
+      throw new Error("incorrect password");
+    }
+
+    return {
+      user,
+      token: jwt.sign({ userId: user.id }, "thisisasecret")
+    };
+  },
+  async deleteUser(parent, args, { prisma }, info) {
+    const userId = getUserId(request);
+    const userExists = await prisma.exists.User({ id: id });
+    if (!userExists) {
+      throw new Error("user does not exist");
+    }
+
+    return prisma.mutation.deleteUser(
+      {
+        where: {
+          id: userId
+        }
+      },
+      info
+    );
+  },
+  async updateUser(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+    return prisma.mutation.updateUser(
+      {
+        where: {
+          id: userId
+        },
+        data: args.data
+      },
+      info
+    );
+  },
+  async createBook(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+    const userExists = prisma.exists.User({ id: args.author });
+    if (!userExists) {
+      throw new Error("user does not exist");
+    }
+
+    return prisma.mutation.createBook(
+      {
+        data: {
+          ...args.data,
+          author: {
+            connect: {
+              id: userId
+            }
+          }
+        }
+      },
+      info
+    );
+  },
+  async deleteBook(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+    const bookExists = await prisma.exists.Book({
+      id: args.id,
+      author: {
+        id: userId
+      }
+    });
+    if (!bookExists) {
+      throw new Error("Unable to delete Book");
+    }
+    return prisma.mutation.deleteBook({ where: { id: args.id } }, info);
+  },
+  async updateBook(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+    const bookExists = prisma.exists.Book({
+      id: args.id,
+      author: {
+        id: userId
+      }
+    });
+    if (!bookExists) {
+      throw new Error("Unable to update book");
+    }
+
+    return prisma.mutation.updateBook(
+      { where: { id: args.id }, data: args.data },
+      info
+    );
+  },
+  async createAnnotation(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+    const bookExists = await prisma.exists.Book({
+      id: args.parent,
+      author: {
+        id: userId
+      }
+    });
+    if (!bookExists) {
+      throw new Error("Unable to create annotation");
+    }
+
+    return prisma.mutation.createAnnotation(
+      {
+        data: {
+          author: {
+            connect: {
+              id: userId
+            }
+          },
+          parent: {
+            connect: {
+              id: args.parent
+            }
+          },
+          ...args.data
+        }
+      },
+      info
+    );
+  },
+  async deleteAnnotation(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+    const annotationExists = await prisma.exists.Annotation({
+      id: args.id,
+      author: {
+        id: userId
+      }
+    });
+    if (!annotationExists) {
+      throw new Error("Unable to delete annotation.");
+    }
+    return prisma.mutation.deleteAnnotation(
+      {
+        where: {
+          id: args.id
+        }
+      },
+      info
+    );
+  },
+  async updateAnnotation(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+    const annotationExists = await prisma.exists.Annotation({
+      id: args.id,
+      author: {
+        id: userId
+      }
+    });
+    if (!annotationExists) {
+      throw new Error("Unable to update annotation.");
+    }
+    return prisma.mutation.updateAnnotation(
+      {
+        where: {
+          id: args.id
+        },
+        data: args.data
+      },
+      info
+    );
+  }
+};
+
+export { Mutation as default };

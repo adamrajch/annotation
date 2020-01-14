@@ -3,24 +3,30 @@ import db from "./db";
 import Query from "./resolvers/Query";
 import Mutation from "./resolvers/Mutation";
 import User from "./resolvers/User";
-import AniList from "./resolvers/AniList";
-import Show from "./resolvers/Show";
+import Book from "./resolvers/Book";
+import Annotation from "./resolvers/Annotation";
+import Group from "./resolvers/Group";
 import Subscription from "./resolvers/Subscription";
-import "./prisma";
-const pubsub = new PubSub();
+import prisma from "./prisma";
+// const pubsub = new PubSub();
 const server = new GraphQLServer({
-  typeDefs: "./src/schema.graphql",
+  typeDefs: "./src/annotationschema.graphql",
   resolvers: {
     Query,
     Mutation,
     Subscription,
-    User,
-    AniList,
-    Show
+    Book,
+    Group,
+    Annotation,
+    User
   },
-  context: {
-    db,
-    pubsub
+  context(request) {
+    return {
+      db,
+      // pubsub,
+      prisma,
+      request
+    };
   }
 });
 

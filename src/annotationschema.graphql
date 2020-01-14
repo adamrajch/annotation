@@ -1,0 +1,122 @@
+type Query {
+  me: User!
+  users(query: String): [User!]!
+  books(query: String): [Book!]!
+  groups(query: String): [Group!]!
+  annotations(query: String): [Annotation!]!
+  findBook(id: ID): Book!
+  findAnnotation(id: ID): Annotation!
+}
+type Mutation {
+  createUser(data: CreateUserInput!): AuthPayload!
+  loginUser(email: String!, password: String!): AuthPayload!
+  deleteUser: User!
+  updateUser(data: updateUserInput!): User!
+  createBook(data: createBookData!): Book!
+  deleteBook(id: ID!): Book!
+  updateBook(id: ID!, data: updateBookInput!): Book!
+  createAnnotation(parent: ID!, data: AnnotationData!): Annotation!
+  deleteAnnotation(id: ID!): Annotation!
+  updateAnnotation(id: ID!, data: updateAnnotationInput!): Annotation!
+}
+
+type Subscription {
+  # count: Int!
+  book: BookSubscriptionPayload!
+  annotation(bookId: ID!): AnnotationSubscriptionPayload!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  password: String!
+  books: [Book!]!
+  groups: [Group!]!
+  annotations: [Annotation!]!
+}
+
+type Annotation {
+  id: ID!
+  quote: String!
+  note: [String!]!
+  chapter: String!
+  page: Int
+  title: String!
+  parent: Book!
+  author: User!
+  favorite: Boolean!
+  tags: [String!]!
+  groups: [Group!]!
+}
+
+type Book {
+  id: ID!
+  title: String!
+  writer: String!
+  author: User!
+  annotations: [Annotation!]!
+}
+
+type Group {
+  id: ID!
+  title: String!
+  author: User!
+  annotations: [Annotation!]!
+}
+type AuthPayload {
+  token: String!
+  user: User!
+}
+input createBookData {
+  title: String!
+  writer: String!
+}
+input updateBookInput {
+  title: String
+  writer: String
+}
+input updateUserInput {
+  name: String
+  email: String
+}
+
+input updateAnnotationInput {
+  quote: String
+  note: [String!]
+  chapter: String
+  page: Int
+  title: String
+  favorite: Boolean
+  tags: [String!]
+}
+input AnnotationData {
+  quote: String
+  note: [String!]
+  chapter: String
+  page: Int
+  title: String
+  favorite: Boolean
+  tags: [String!]
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+enum MutationType {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+type BookSubscriptionPayload {
+  mutation: MutationType
+  node: Book
+}
+
+type AnnotationSubscriptionPayload {
+  mutation: MutationType!
+  node: Annotation
+}
