@@ -42,9 +42,9 @@ const Mutation = {
       token: jwt.sign({ userId: user.id }, "thisisasecret")
     };
   },
-  async deleteUser(parent, args, { prisma }, info) {
+  async deleteUser(parent, args, { prisma, request }, info) {
     const userId = getUserId(request);
-    const userExists = await prisma.exists.User({ id: id });
+    const userExists = await prisma.exists.User({ id: userId });
     if (!userExists) {
       throw new Error("user does not exist");
     }
@@ -72,7 +72,7 @@ const Mutation = {
   },
   async createBook(parent, args, { prisma, request }, info) {
     const userId = getUserId(request);
-    const userExists = prisma.exists.User({ id: args.author });
+    const userExists = prisma.exists.User({ id: userId });
     if (!userExists) {
       throw new Error("user does not exist");
     }

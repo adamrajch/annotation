@@ -2,6 +2,7 @@ type Query {
   me: User!
   users(query: String): [User!]!
   books(query: String): [Book!]!
+  myBooks(query:String): [Book!]!
   groups(query: String): [Group!]!
   annotations(query: String): [Annotation!]!
   findBook(id: ID): Book!
@@ -29,7 +30,7 @@ type Subscription {
 type User {
   id: ID!
   name: String!
-  email: String!
+  email: String
   password: String!
   books: [Book!]!
   groups: [Group!]!
