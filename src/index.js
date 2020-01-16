@@ -1,33 +1,19 @@
 import { GraphQLServer, PubSub } from "graphql-yoga";
 import db from "./db";
-import Query from "./resolvers/Query";
-import Mutation from "./resolvers/Mutation";
-import User from "./resolvers/User";
-import Book from "./resolvers/Book";
-import Annotation from "./resolvers/Annotation";
-import Group from "./resolvers/Group";
-import Subscription from "./resolvers/Subscription";
 import prisma from "./prisma";
+import { resolvers, fragmentReplacements } from "./resolvers/index";
 // const pubsub = new PubSub();
 const server = new GraphQLServer({
   typeDefs: "./src/annotationschema.graphql",
-  resolvers: {
-    Query,
-    Mutation,
-    Subscription,
-    Book,
-    Group,
-    Annotation,
-    User
-  },
+  resolvers,
   context(request) {
     return {
       db,
-      // pubsub,
       prisma,
       request
     };
-  }
+  },
+  fragmentReplacements
 });
 
 server.start(() => {

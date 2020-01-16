@@ -1,5 +1,5 @@
 # source: http://192.168.99.100:4466
-# timestamp: Mon Jan 13 2020 04:25:32 GMT-0600 (Central Standard Time)
+# timestamp: Wed Jan 15 2020 17:36:43 GMT-0600 (Central Standard Time)
 
 type AggregateAnnotation {
   count: Int!
@@ -753,6 +753,7 @@ type Book implements Node {
   title: String!
   author: User!
   writer: String!
+  private: Boolean!
   annotations(where: AnnotationWhereInput, orderBy: AnnotationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Annotation!]
 }
 
@@ -770,6 +771,7 @@ input BookCreateInput {
   id: ID
   title: String!
   writer: String!
+  private: Boolean
   author: UserCreateOneWithoutBooksInput!
   annotations: AnnotationCreateManyWithoutParentInput
 }
@@ -788,6 +790,7 @@ input BookCreateWithoutAnnotationsInput {
   id: ID
   title: String!
   writer: String!
+  private: Boolean
   author: UserCreateOneWithoutBooksInput!
 }
 
@@ -795,6 +798,7 @@ input BookCreateWithoutAuthorInput {
   id: ID
   title: String!
   writer: String!
+  private: Boolean
   annotations: AnnotationCreateManyWithoutParentInput
 }
 
@@ -814,12 +818,15 @@ enum BookOrderByInput {
   title_DESC
   writer_ASC
   writer_DESC
+  private_ASC
+  private_DESC
 }
 
 type BookPreviousValues {
   id: ID!
   title: String!
   writer: String!
+  private: Boolean!
 }
 
 input BookScalarWhereInput {
@@ -951,6 +958,10 @@ input BookScalarWhereInput {
 
   """All values not ending with the given string."""
   writer_not_ends_with: String
+  private: Boolean
+
+  """All values that are not equal to given value."""
+  private_not: Boolean
 }
 
 type BookSubscriptionPayload {
@@ -993,6 +1004,7 @@ input BookSubscriptionWhereInput {
 input BookUpdateInput {
   title: String
   writer: String
+  private: Boolean
   author: UserUpdateOneRequiredWithoutBooksInput
   annotations: AnnotationUpdateManyWithoutParentInput
 }
@@ -1000,11 +1012,13 @@ input BookUpdateInput {
 input BookUpdateManyDataInput {
   title: String
   writer: String
+  private: Boolean
 }
 
 input BookUpdateManyMutationInput {
   title: String
   writer: String
+  private: Boolean
 }
 
 input BookUpdateManyWithoutAuthorInput {
@@ -1034,12 +1048,14 @@ input BookUpdateOneRequiredWithoutAnnotationsInput {
 input BookUpdateWithoutAnnotationsDataInput {
   title: String
   writer: String
+  private: Boolean
   author: UserUpdateOneRequiredWithoutBooksInput
 }
 
 input BookUpdateWithoutAuthorDataInput {
   title: String
   writer: String
+  private: Boolean
   annotations: AnnotationUpdateManyWithoutParentInput
 }
 
@@ -1188,6 +1204,10 @@ input BookWhereInput {
 
   """All values not ending with the given string."""
   writer_not_ends_with: String
+  private: Boolean
+
+  """All values that are not equal to given value."""
+  private_not: Boolean
   author: UserWhereInput
   annotations_every: AnnotationWhereInput
   annotations_some: AnnotationWhereInput

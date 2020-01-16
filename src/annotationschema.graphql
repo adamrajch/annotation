@@ -2,7 +2,7 @@ type Query {
   me: User!
   users(query: String): [User!]!
   books(query: String): [Book!]!
-  myBooks(query:String): [Book!]!
+  myBooks(query: String): [Book!]!
   groups(query: String): [Group!]!
   annotations(query: String): [Annotation!]!
   findBook(id: ID): Book!
@@ -57,6 +57,7 @@ type Book {
   writer: String!
   author: User!
   annotations: [Annotation!]!
+  private: Boolean!
 }
 
 type Group {
@@ -76,6 +77,7 @@ input createBookData {
 input updateBookInput {
   title: String
   writer: String
+  private: Boolean
 }
 input updateUserInput {
   name: String

@@ -28,6 +28,7 @@ type Book {
   title: String!
   author: User! @relation(name: "UserBooks", onDelete: SET_NULL)
   writer: String!
+  private: Boolean! @default(value: false)
   annotations: [Annotation!]! @relation(name: "BookNotes", onDelete: CASCADE)
 }
 

@@ -15,9 +15,6 @@ const Query = {
         OR: [
           {
             name_contains: args.query
-          },
-          {
-            email_contains: args.query
           }
         ]
       };
@@ -41,24 +38,26 @@ const Query = {
     return prisma.query.books(opArgs, info);
   },
   myBooks(parent, args, { prisma, request }, info) {
-    const userId = getUserId(request)
+    const userId = getUserId(request);
     const opArgs = {
       where: {
         author: {
           id: userId
         }
       }
-    }
+    };
     if (args.query) {
-      opArgs.where.OR = [{
-        title_contains: args.query
-      }, {
-        writer_contains: args.query
-      }]
+      opArgs.where.OR = [
+        {
+          title_contains: args.query
+        },
+        {
+          writer_contains: args.query
+        }
+      ];
     }
-    return prisma.query.books(opArgs, info)
-  }
-  ,
+    return prisma.query.books(opArgs, info);
+  },
   annotations(parent, args, { db, prisma }, info) {
     const opArgs = {};
     if (args.query) {
