@@ -7,6 +7,8 @@ type User {
   groups: [Group!]! @relation(name: "UserGroups", onDelete: CASCADE)
   annotations: [Annotation!]!
     @relation(name: "UserAnnotations", onDelete: CASCADE)
+  updatedAt: DateTime! @updatedAt
+  createdAt: DateTime! @createdAt
 }
 
 type Annotation {
@@ -21,6 +23,8 @@ type Annotation {
   favorite: Boolean! @default(value: false)
   tags: [String!]! @scalarList(strategy: RELATION)
   groups: [Group!]! @relation(name: "GroupAnnotations", onDelete: SET_NULL)
+  updatedAt: DateTime! @updatedAt
+  createdAt: DateTime! @createdAt
 }
 
 type Book {
@@ -30,6 +34,8 @@ type Book {
   writer: String!
   private: Boolean! @default(value: false)
   annotations: [Annotation!]! @relation(name: "BookNotes", onDelete: CASCADE)
+  updatedAt: DateTime! @updatedAt
+  createdAt: DateTime! @createdAt
 }
 
 type Group {
@@ -38,4 +44,6 @@ type Group {
   author: User! @relation(name: "UserGroups", onDelete: SET_NULL)
   annotations: [Annotation!]!
     @relation(name: "GroupAnnotations", onDelete: SET_NULL)
+    updatedAt: DateTime! @updatedAt
+  createdAt: DateTime! @createdAt
 }

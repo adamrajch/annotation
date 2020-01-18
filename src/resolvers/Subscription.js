@@ -1,3 +1,4 @@
+import getUserId from '../utils/getUserId'
 const Subscription = {
   book: {
     subscribe(parent, args, { prisma }, info) {
@@ -18,6 +19,20 @@ const Subscription = {
         },
         info
       );
+    }
+  },
+  myBook: {
+    subscribe(parent, args, { prisma, request }, info) {
+      const userId = getUserId(request)
+      return prisma.subscription.book({
+        where: {
+          node: {
+            author: {
+              id: userId
+            }
+          }
+        }
+      }, info)
     }
   }
   //   group: {

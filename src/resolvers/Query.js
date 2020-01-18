@@ -9,7 +9,12 @@ const Query = {
     });
   },
   users(parent, args, { db, prisma }, info) {
-    const opArgs = {};
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after,
+      orderBy: args.ordyBy
+    };
     if (args.query) {
       opArgs.where = {
         OR: [
@@ -22,7 +27,11 @@ const Query = {
     return prisma.query.users(opArgs, info);
   },
   books(parent, args, { db, prisma }, info) {
-    const opArgs = {};
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after
+    };
     if (args.query) {
       opArgs.where = {
         OR: [
@@ -40,6 +49,9 @@ const Query = {
   myBooks(parent, args, { prisma, request }, info) {
     const userId = getUserId(request);
     const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after,
       where: {
         author: {
           id: userId
@@ -58,8 +70,12 @@ const Query = {
     }
     return prisma.query.books(opArgs, info);
   },
-  annotations(parent, args, { db, prisma }, info) {
-    const opArgs = {};
+  annotations(parent, args, { prisma }, info) {
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after
+    };
     if (args.query) {
       opArgs.where = {
         OR: [
@@ -87,7 +103,11 @@ const Query = {
     return prisma.query.annotations(opArgs, info);
   },
   groups(parent, args, { prisma }, info) {
-    const opArgs = {};
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after
+    };
     if (opArgs) {
       opArgs.where = {
         title_contains: args.query
