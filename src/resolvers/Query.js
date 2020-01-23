@@ -13,7 +13,7 @@ const Query = {
       first: args.first,
       skip: args.skip,
       after: args.after,
-      orderBy: args.ordyBy
+      orderBy: args.orderBy
     };
     if (args.query) {
       opArgs.where = {
@@ -30,7 +30,8 @@ const Query = {
     const opArgs = {
       first: args.first,
       skip: args.skip,
-      after: args.after
+      after: args.after,
+      orderBy: args.orderBy
     };
     if (args.query) {
       opArgs.where = {
@@ -52,6 +53,7 @@ const Query = {
       first: args.first,
       skip: args.skip,
       after: args.after,
+      orderBy: args.orderBy,
       where: {
         author: {
           id: userId
@@ -74,7 +76,8 @@ const Query = {
     const opArgs = {
       first: args.first,
       skip: args.skip,
-      after: args.after
+      after: args.after,
+      orderBy: args.orderBy
     };
     if (args.query) {
       opArgs.where = {
@@ -106,7 +109,8 @@ const Query = {
     const opArgs = {
       first: args.first,
       skip: args.skip,
-      after: args.after
+      after: args.after,
+      orderBy: args.orderBy
     };
     if (opArgs) {
       opArgs.where = {

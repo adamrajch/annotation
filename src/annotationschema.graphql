@@ -1,11 +1,11 @@
-#import UserOrderByInput from './generated/prisma.graphql'
+#import UserOrderByInput, BookOrderByInput, GroupOrderByInput, AnnotationOrderByInput from './generated/prisma.graphql'
 type Query {
   me: User!
   users(query: String, skip: Int, first: Int, after:String, orderBy: UserOrderByInput): [User!]!
-  books(query: String, skip:Int, first:Int, after: String): [Book!]!
-  myBooks(query: String,skip:Int, first:Int, after: String): [Book!]!
-  groups(query: String,skip:Int, first:Int, after: String): [Group!]!
-  annotations(query: String,skip:Int, first:Int, after: String): [Annotation!]!
+  books(query: String, skip:Int, first:Int, after: String , orderBy: BookOrderByInput): [Book!]!
+  myBooks(query: String,skip:Int, first:Int, after: String, orderBy: BookOrderByInput): [Book!]!
+  groups(query: String,skip:Int, first:Int, after: String, orderBy: GroupOrderByInput): [Group!]!
+  annotations(query: String,skip:Int, first:Int, after: String, orderBy: AnnotationOrderByInput): [Annotation!]!
   findBook(id: ID): Book!
   findAnnotation(id: ID): Annotation!
 }
